@@ -1,20 +1,25 @@
 use rand::{thread_rng,Rng};
 
 fn main() {
-    let modes = [1,2,3];
-    println!("The following modes are available:\n  - All letters (1)\n  - One random letter (2)\n  - Random letters sequence (3)");
+    let modes = [1,2,3,4,5];
+    println!("The following modes are available:\n  - All letters (1)\n  - One random letter (2)\n  - Random letters sequence (3)\
+    \n  - All letters in reversed order (4)\n  - Consecutive letters from certain position (5)");
     loop{
-        println!("Please select the mode (1, 2 or 3)");
+        let alphabet = Alphabet::new();
+        println!("Please select the mode (1, 2, 3, 4, 5)");
         let mut temp_num = String::new();
         let _ = std::io::stdin().read_line(&mut temp_num);
         let mode: u32 = temp_num.trim().parse().unwrap();
         if !modes.contains(&mode){
             println!("No such mode, please start again");
+            break;
         }
         match mode{
-            1=>all_letters(),
+            1=>all_letters(alphabet),
             2=>random_letters(),
             3=>random_sequence(),
+            4=>all_letters_reversed(alphabet),
+            5=>from_position(alphabet),
             _=>{}
         }
         println!("\nTo select new mode and continue press Enter. To exit press 'e' and Enter");
@@ -27,8 +32,7 @@ fn main() {
     }
 }
 
-fn all_letters(){
-    let alphabet = Alphabet::new();
+fn all_letters(alphabet: Alphabet){
     println!("All letters mode. Press Enter to get the mkhedruli writing.");
     println!("To continue to the next letter press Enter. To exit press 'e' and Enter");
     for letter in &alphabet.alphabet{
@@ -42,6 +46,18 @@ fn all_letters(){
             _ => continue,
         }
     }
+}
+fn all_letters_reversed(mut alphabet: Alphabet){
+    alphabet.alphabet.reverse();
+    all_letters(alphabet);
+}
+fn from_position(mut alphabet: Alphabet){
+    println!("Please enter a position to start and press Enter");
+    let mut temp_num = String::new();
+    let _ = std::io::stdin().read_line(&mut temp_num);
+    let position: usize = temp_num.trim().parse().unwrap();
+    alphabet.alphabet = (&alphabet.alphabet[position-1..]).to_vec();
+    all_letters(alphabet);
 }
 
 fn random_letters(){
@@ -154,7 +170,7 @@ impl Alphabet{
         alphabet
     }
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 struct Letter{
     position: u8,
     name: &'static str,
